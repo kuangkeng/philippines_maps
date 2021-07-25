@@ -1,0 +1,493 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css"/>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
+    
+    
+    <script type="text/javascript" src="js/ICCA2.js"></script>
+    <script type="text/javascript" src="js/Key_Biodiversity_Areas2.js"></script>
+    <script type="text/javascript" src="js/LCA2.js"></script>
+    <script type="text/javascript" src="js/NGP2.js"></script>
+    <script type="text/javascript" src="js/pcsd_ecan_zone2.js"></script>
+    <script type="text/javascript" src="js/Protected_Areas2.js"></script>
+    <script type="text/javascript" src="js/protectedareaspalawan2.js"></script>
+  </head>
+
+<style>
+/* latin */
+@font-face {
+  font-family: 'Lusitana';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Lusitana'), url('https://fonts.gstatic.com/s/lusitana/v7/CSR84z9ShvucWzsMKyhdTOIAStt-.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* latin */
+@font-face {
+  font-family: 'Lusitana';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Lusitana Bold'), local('Lusitana-Bold'), url('https://fonts.gstatic.com/s/lusitana/v7/CSR74z9ShvucWzsMKyDmafctaNZUvuwl.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+body {
+  font-family: 'Lusitana',serif;
+  font-size: 18px;
+  line-height: 1.5;
+  color: black;
+  box-sizing: border-box;
+  margin: 0;
+} 
+#wrapper {
+  width: 100%;
+  position: relative;
+  margin: 0;
+}
+.mapbox { 
+  height: 600px; 
+  width: 100%;
+  margin-bottom: 20px;
+}
+.leaflet-bottom {
+	bottom: 1rem;
+}
+.leaflet-right {
+	right: 1rem;
+}
+.textblock {
+	top:0;
+	width: 100%;
+	padding: 0;
+}
+.textblock p {
+	font: normal 23px/30px Lusitana;
+}
+@media (max-width: 500px ) {
+  .headline {font-size: 16px; line-height: 20px; padding-bottom: 0px;}
+  #text {font-size: 13px;line-height: 15px;padding-bottom: 3px;}
+}
+.headline {
+  font-style: normal;
+  font-size: 24px;
+  font-weight: 400;
+  padding-bottom: 10px;
+  padding-top: 10px;
+}
+.text {
+}
+.leaflet-popup-close-button {
+  display: none;
+}
+
+.legend {
+	line-height: 18px;
+	color: #555;
+	background-color: rgba(256, 256, 256, 0.9);
+   	padding:5px;
+}
+.legend i {
+	width: 18px;
+	height: 18px;
+	float: left;
+	margin-right: 8px;
+	opacity: 0.7;
+}
+
+.legend-camera {
+  border-radius: 50%;
+}
+
+</style>
+</head>
+<body>
+
+<div id="wrapper"> 
+    <!--<div class="textblock">
+		<p>This map of city-owned surveillance camera locations and 2018 homicides offers a striking visual. Each black X marks a homicide in 2018. Most murders in City of St. Louis that year occurred in North St. Louis. Most cameras listed on public audits from the police and streets departments are located downtown, far from where the majority of homicides took place. Cameras are clustered in business districts, where incomes tend to be higher, and where more residents are white.<br><br>Click on the icon in the top right to toggle between block-level income and race census data. On the left hand corner, you can zoom into different neighborhoods by clicking the + sign.</p>
+	</div>-->
+    <div class="mapbox" id="map-container">
+    </div>
+     
+</div>    
+
+<script type="text/javascript">
+var zoomlevel;
+if(window.innerHeight<500){
+  zoomlevel = 6;
+} else if(window.innerHeight>499 && window.innerHeight<929){
+  zoomlevel = 7;
+}
+else if(window.innerHeight>930){
+  zoomlevel = 8;
+}
+
+
+
+// Switch to Carto for base map layer 2021-01-11
+var mymap = L.map('map-container').setView([9.44267272151284, 118.39550862640878], zoomlevel);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+	subdomains: 'abcd',
+	maxZoom: 19
+}).addTo(mymap);
+
+//Style map
+
+function style_ICCA(feature) {
+    return {
+        fillColor: '#8dd3c7',
+        weight: 0.5,
+        opacity: 1,
+        color: '#ffffff',
+        fillOpacity: 0.6
+    };
+}
+
+function style_bio(feature) {
+    return {
+        fillColor: '#fb8072',
+        weight: 0.5,
+        opacity: 1,
+        color: '#ffffff',
+        fillOpacity: 0.6
+    };
+}
+
+function style_ecan(feature) {
+    return {
+        fillColor: '#bebada',
+        weight: 0.5,
+        opacity: 1,
+        color: '#ffffff',
+        fillOpacity: 0.6
+    };
+}
+
+function style_protect(feature) {
+    return {
+        fillColor: '#80b1d3',
+        weight: 0.5,
+        opacity: 1,
+        color: '#ffffff',
+        fillOpacity: 0.6
+    };
+}
+
+function style_palawan(feature) {
+    return {
+        fillColor: '#fdb462',
+        weight: 0.5,
+        opacity: 1,
+        color: '#ffffff',
+        fillOpacity: 0.6
+    };
+}
+
+function style_ngp(feature) {
+    return {
+        fillColor: '#f0027f',
+        weight: 0.5,
+        opacity: 1,
+        color: '#ffffff',
+        fillOpacity: 0.6
+    };
+}
+
+var style_LCA = {
+    radius: 5,
+    fillColor: "#0376B4",
+    color: "#0376B4",
+    weight: 1,
+    opacity: 1,
+    fillOpacity: 0.6
+};
+
+//create pane to fix the zindex of the 2 base layers (race and income)
+mymap.createPane('pane_icca');
+mymap.createPane('pane_bio');
+mymap.createPane('pane_ecan');
+mymap.createPane('pane_protect');
+mymap.createPane('pane_palawan');
+mymap.createPane('pane_ngp');
+
+//Set up base layers
+var layer_ICCA = L.geoJSON(ICCA_map, {
+    style: style_ICCA,
+    // onEachFeature: onIncomeBlock,
+    pane: 'pane_icca'
+});
+var layer_bio = L.geoJSON(keybiodiversity_map, {
+    style: style_bio,
+    onEachFeature: on_bio,
+    pane: 'pane_bio'
+});
+var layer_ecan = L.geoJSON(ecan_map, {
+    style: style_ecan,
+    pane: 'pane_ecan'
+});
+var layer_protect = L.geoJSON(protectedareas_map, {
+    style: style_protect,
+    pane: 'pane_protect'
+});
+var layer_palawan = L.geoJSON(protectedareaspalawan_map, {
+    style: style_palawan,
+    pane: 'pane_palawan'
+});
+var layer_ngp = L.geoJSON(NGP_map, {
+    style: style_ngp,
+    pane: 'pane_ngp'
+});
+
+//Set up point layers
+var layer_LCA = L.geoJSON(LCA_map, {
+  pointToLayer: (geoJsonPoint, latlng) => {
+    return L.circleMarker(latlng, style_LCA);
+  },
+  onEachFeature: onEachLCA,
+});
+
+//setup popup for point layer
+function onEachLCA(feature, layer) {
+        layer.bindPopup("Location: " + feature.properties.LCA_NAME);
+}
+
+//colect all point layers into an array
+var all_maps = {
+    "ICCA": layer_ICCA,
+    "Key biodiversity areas": layer_bio,
+    "PCSD ECAN zone": layer_ecan,
+    "LCA": layer_LCA,
+    "Protected areas": layer_protect,
+    "Palawan protected areas": layer_palawan,
+    "National greening program": layer_ngp,
+};
+//Preload polygon map
+layer_bio.addTo(mymap);
+mymap.addLayer(layer_LCA);
+//Load control panel that has both base maps and camera maps option
+var control = L.control.layers(null, all_maps).addTo(mymap);
+mymap.getPane('pane_icca').style.zIndex = 240;
+mymap.getPane('pane_bio').style.zIndex = 230;
+mymap.getPane('pane_ecan').style.zIndex = 220;
+mymap.getPane('pane_protect').style.zIndex = 210;
+mymap.getPane('pane_palawan').style.zIndex = 200;
+mymap.getPane('pane_ngp').style.zIndex = 190;
+// //mouseover interaction
+// var lastClickedIncome = null;
+// function highlightIncome(feature, layer) {
+//     //return the previous polygon to its original style
+//     if (lastClickedIncome !== null) {
+//       lastClickedIncome.setStyle({
+//         weight: 1,
+//         color: 'white',
+//         fillOpacity: 0.6
+//       });
+//     }
+//     var thisIncome = this;
+//     this.setStyle({
+//         weight: 0.5,
+//         color: '#464646',
+//         fillOpacity: 0.7
+//     });
+//     this.bindPopup(this.feature.properties.name + "<br>Median household income: <b>" + formatIncome(this.feature.properties.income) + "</b>").openPopup();
+//     if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+//       this.bringToFront();
+//     }
+//     lastClickedIncome = thisIncome;
+// }
+var lastClicked_bio = null;
+function highlight_bio(feature, layer) {
+    //return the previous polygon to its original style
+    if (lastClicked_bio !== null) {
+      lastClicked_bio.setStyle({
+        weight: 1,
+        color: 'white',
+        fillOpacity: 0.6
+      });
+    }
+    var this_bio = this;
+    this.setStyle({
+        weight: 0.5,
+        color: '#464646',
+        fillOpacity: 0.8
+    });
+    this.bindPopup("KBA name: " + this.feature.properties.KBA_NAME).openPopup();
+    if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+        this.bringToFront();
+    }
+    lastClicked_bio = this_bio;
+}
+// function resetIncome(e) {
+//     this.closePopup();
+//     layerIncome.resetStyle(e.target);
+// }
+function reset_bio(e) {
+    this.closePopup();
+    layer_bio.resetStyle(e.target);
+}
+// function onIncomeBlock(feature, layer) {
+//     layer.on({
+//         mouseover: highlightIncome,
+//         mouseout: resetIncome,
+//         click: highlightIncome,
+//     });
+// }
+function on_bio(feature, layer) {
+    layer.on({
+        mouseover: highlight_bio,
+        mouseout: reset_bio,
+        click: highlight_bio,
+    });
+}
+// //thousand separator function
+// function formatIncome(num) {
+//   if (num == "No population"){ return "No population"}
+//     else if (num == "N/A"){ return "N/A"}
+//     else {return "$" + num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')}
+// }
+// function formatIncome2(num) {
+//   if (num == "No population"){ return "No population"}
+//     else if (num == "N/A"){ return "N/A"}
+//     else {return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')}
+// }
+// function formatRace(num) {
+//   if (num == "No population"){ return "No population"}
+//     else {return (num*100).toFixed(1) + "%"}
+// }
+// function formatLegendRace1(num) {
+//   if (num == "No population"){ return "No population"}
+//     else {return (num*100).toFixed(0)}
+// }
+// function formatLegendRace2(num) {
+//   if (num == "No population"){ return "No population"}
+//     else {return (num*100).toFixed(0) + "%"}
+// }
+// //setup legend
+// var legendIncome = L.control({position: 'bottomright'});
+// legendIncome.onAdd = function (map) {
+// 	var div = L.DomUtil.create('div', 'info legend'),
+// 		grades = [0, 30000, 50000, 70000, 90000],
+// 		labels = [];
+//   div.innerHTML += '<b>Median household income</b><br>';
+// 	// loop through our density intervals and generate a label with a colored square for each interval
+// 	for (var i = 0; i < grades.length; i++) {
+// 		div.innerHTML +=
+// 			'<i style="background:' + getIncomeColor(grades[i] + 1) + ';opacity:0.6;"></i> ' +
+// 			formatIncome(grades[i]) + formatIncome2(grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+// 	}
+// 	return div;
+// };
+// var legendRace = L.control({position: 'bottomright'});
+// legendRace.onAdd = function (map) {
+// 	var div = L.DomUtil.create('div', 'info legend'),
+// 		grades = [0, 0.2, 0.4, 0.6, 0.8],
+// 		labels = [];
+//   div.innerHTML += '<b>Black population</b><br>';
+// 	// loop through our density intervals and generate a label with a colored square for each interval
+// 	for (var i = 0; i < grades.length; i++) {
+// 		div.innerHTML +=
+// 			'<i style="background:' + getRaceColor(grades[i]+0.1) + ';opacity:0.5;"></i> ' +
+// 			formatLegendRace1(grades[i]) + (grades[i + 1] ? '&ndash;' + formatLegendRace2(grades[i + 1]) + '<br>' : '%+');
+// 	}
+// 	return div;
+// };
+// var legendCamera = L.control({position: 'bottomleft'});
+// legendCamera.onAdd = function (map) {
+// 	var div = L.DomUtil.create('div', 'info legend');
+//   div.innerHTML += '<i style="background:#0376B4" class="legend-camera"></i>Police camera<br><i style="background:#f5c11f" class="legend-camera"></i>Street camera<br><i style="background:#696969" class="legend-camera"></i>Estimated camera<br><div class="legend-homicide"><img src="js/icon-cross.png" height="10px" width="10px"></div>Homicide<br>';
+// 	return div;
+// };
+// legendRace.addTo(mymap);
+// legendCamera.addTo(mymap);
+// // Add and remove layers
+// mymap.on('baselayerchange', function (eventLayer) {
+//     // Switch to the legend...
+//     if (eventLayer.name === 'Income') {
+//         mymap.removeControl(legendRace);
+//         legendIncome.addTo(mymap);
+//     } else if (eventLayer.name === 'Race') { // Or switch to the treeline legend...
+//         mymap.removeControl(legendIncome);
+//         legendRace.addTo(mymap);
+//     } else {
+//         mymap.removeControl(legendIncome);
+//         mymap.removeControl(legendRace);
+//     }
+// });
+
+// Add Scrollify object and callback function
+/*$.scrollify({
+    section : ".textblock",
+    sectionName: "section-name",
+    easing: "easeOutExpo",
+    scrollSpeed: 1100,
+    offset : 0,
+    scrollbars: true,
+    setHeights: true,
+    overflowScroll: true,
+    before:function(index,sections) {
+		if ($.scrollify.current().attr('name') ==='intro') {
+			layerRace.remove();
+			legendRace.remove();
+			layerIncome.remove();
+			legendIncome.remove();
+			layerHomicide.remove();
+			layerPolice.remove();
+			layerStreets.remove();
+			layerEstimate.remove();
+			legendCamera.remove();
+			layerEmpty.addTo(mymap);
+		} 
+		else 
+		
+		if ($.scrollify.current().attr('name') === 'homicides') {
+			//layerRace.remove();
+			//legendRace.remove();
+			//layerIncome.remove();
+			//legendIncome.remove();
+			layerHomicide.addTo(mymap);
+			layerPolice.remove();
+			layerStreets.remove();
+			layerEstimate.remove();
+			legendCamera.remove();
+			//layerEmpty.addTo(mymap);
+		} 
+		else 
+		
+		if ($.scrollify.current().attr('name') === 'cameras') {
+			layerIncome.remove();
+			legendIncome.remove();
+			layerPolice.addTo(mymap);
+			layerStreets.addTo(mymap);
+			layerEstimate.addTo(mymap);
+			legendCamera.addTo(mymap);
+		} 
+		else 
+		
+		if ($.scrollify.current().attr('name') === 'income') {
+			layerIncome.addTo(mymap);
+			legendIncome.addTo(mymap);
+			layerRace.remove();
+			legendRace.remove();
+			legendCamera.remove();
+		} 
+		else
+		
+		if ($.scrollify.current().attr('name') === 'race') {
+			layerRace.addTo(mymap);
+			legendRace.addTo(mymap);
+			layerIncome.remove();
+			legendIncome.remove();
+		} 
+		
+		else {
+			false;
+		}
+    },
+  });*/
+</script>
+</body>
+</html>
