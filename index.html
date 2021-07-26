@@ -187,15 +187,15 @@ function style_palawan(feature) {
     };
 }
 
-function style_ngp(feature) {
-    return {
-        fillColor: '#f0027f',
-        weight: 0.5,
-        opacity: 1,
-        color: '#ffffff',
-        fillOpacity: 0.6
-    };
-}
+// function style_ngp(feature) {
+//     return {
+//         fillColor: '#f0027f',
+//         weight: 0.5,
+//         opacity: 1,
+//         color: '#ffffff',
+//         fillOpacity: 0.6
+//     };
+// }
 
 var style_LCA = {
     radius: 5,
@@ -212,7 +212,7 @@ mymap.createPane('pane_bio');
 mymap.createPane('pane_ecan');
 mymap.createPane('pane_protect');
 mymap.createPane('pane_palawan');
-mymap.createPane('pane_ngp');
+// mymap.createPane('pane_ngp');
 
 //Set up base layers
 var layer_ICCA = L.geoJSON(ICCA_map, {
@@ -237,10 +237,10 @@ var layer_palawan = L.geoJSON(protectedareaspalawan_map, {
     style: style_palawan,
     pane: 'pane_palawan'
 });
-var layer_ngp = L.geoJSON(NGP_map, {
-    style: style_ngp,
-    pane: 'pane_ngp'
-});
+// var layer_ngp = L.geoJSON(NGP_map, {
+//     style: style_ngp,
+//     pane: 'pane_ngp'
+// });
 
 //Set up point layers
 var layer_LCA = L.geoJSON(LCA_map, {
@@ -263,7 +263,7 @@ var all_maps = {
     "LCA": layer_LCA,
     "Protected areas": layer_protect,
     "Palawan protected areas": layer_palawan,
-    "National greening program": layer_ngp,
+    // "National greening program": layer_ngp,
 };
 //Preload polygon map
 layer_bio.addTo(mymap);
@@ -275,7 +275,7 @@ mymap.getPane('pane_bio').style.zIndex = 230;
 mymap.getPane('pane_ecan').style.zIndex = 220;
 mymap.getPane('pane_protect').style.zIndex = 210;
 mymap.getPane('pane_palawan').style.zIndex = 200;
-mymap.getPane('pane_ngp').style.zIndex = 190;
+// mymap.getPane('pane_ngp').style.zIndex = 190;
 // //mouseover interaction
 // var lastClickedIncome = null;
 // function highlightIncome(feature, layer) {
